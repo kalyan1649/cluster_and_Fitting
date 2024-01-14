@@ -1,0 +1,34 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from scipy.optimize import curve_fit
+from scipy.stats import linregress
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+
+dataset = pd.read_csv("cluster.csv")
+
+cluster_indi_codes = ["IQ.CPA.PUBS.XQ", "AG.LND.ARBL.ZS"]
+cluster_years = ["2006", "2019"]
+
+
+def data_frame_extracted(cluster_indi_codes, cluster_years):
+    """ This function retrieves the data for a specific year and indicator code from the dataset, taking two arguments: `cluster_indi_codes` and `cluster_years'. After that, it returns a list of data frames and removes a few columns from the dataset to produce a new data frame."""
+    public_sector = dataset[dataset["Indicator Code"] == cluster_indi_codes[0]]
+    arable_land = dataset[dataset["Indicator Code"] == cluster_indi_codes[1]]
+    # fodata
+    public_sector = public_sector.drop(
+        ["Country Code", "Indicator Name", "Indicator Code"], axis=1).set_index("Country Name")
+    arable_land = arable_land.drop(
+        ["Country Code", "Indicator Name", "Indicator Code"], axis=1).set_index("Country Name")
+    dfs = []
+    for year in cluster_years:
+        public_ = public_sector[year]
+        arable_ = arable_land[year]
+        data_frame = pd.DataFrame(
+            {"CPIA public sector management ": public_, "Arable land": arable_})
+        df = data_frame.dropna(axis=0)
+        dfs.append(df)
+
+    return dfs
