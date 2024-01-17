@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Jan 20 16:33:57 2023
+Created on Fri Dec 22 16:33:57 2023
 
-@author: anush
+@author: sai
 """
 #GITHUB LINK = https://github.com/Anushareddy1203/clustering-and-fitting
 
@@ -20,12 +20,11 @@ from sklearn.preprocessing import StandardScaler
 dataset = pd.read_csv("cluster.csv")
 
 cluster_indi_codes = ["IQ.CPA.PUBS.XQ", "AG.LND.ARBL.ZS"]
-cluster_years = ["2005", "2020"]
+cluster_years = ["2006", "2019"]
 
 
 def data_frame_extracted(cluster_indi_codes, cluster_years):
-    """ This function takes two arguments, `cluster_indi_codes` and `cluster_years`, and extracts the data from the dataset for a given Indicator Code and given year. It then drops some columns from the dataset to create a new dataframe and returns a list of dataframes. 
-"""
+    """ This function retrieves the data for a specific year and indicator code from the dataset, taking two arguments: `cluster_indi_codes` and `cluster_years'. After that, it returns a list of data frames and removes a few columns from the dataset to produce a new data frame."""
     public_sector = dataset[dataset["Indicator Code"] == cluster_indi_codes[0]]
     arable_land = dataset[dataset["Indicator Code"] == cluster_indi_codes[1]]
     # fodata
@@ -52,9 +51,9 @@ dfs_cluster = data_frame_extracted(cluster_indi_codes, cluster_years)
 
 def clustering(data_frames):
     """
-This function clusters a list of dataframes using k-means algorithm. The function first scales the data using standard scaling technique and then finds the optimum number of clusters using the elbow method. It then fits the k-means algorithm to the dataset and plots the clusters and their centroids on the original data. 
+This function uses the k-means method to cluster a list of dataframes. The elbow method is used by the function to determine the ideal number of clusters after standard scaling the data. The clusters and their centroids are then plotted on the original data once the k-means algorithm has been fitted to the dataset. 
 """
-    year = "2005"
+    year = "2006"
     for df in data_frames:
         x = df.values
         scaler = StandardScaler()
@@ -82,13 +81,13 @@ This function clusters a list of dataframes using k-means algorithm. The functio
 
         # Plotting the clusters on original data
         plt.scatter(x_scaled[y_kmeans == 0, 0], x_scaled[y_kmeans ==
-                    0, 1], s=50, c='red', label='Cluster 1')
+                    0, 1], s=50, c='limegreen', label='Cluster 1')
         plt.scatter(x_scaled[y_kmeans == 1, 0], x_scaled[y_kmeans ==
                     1, 1], s=50, c='blue', label='Cluster 2')
         plt.scatter(x_scaled[y_kmeans == 2, 0], x_scaled[y_kmeans ==
-                    2, 1], s=50, c='green', label='Cluster 3')
+                    2, 1], s=50, c='red', label='Cluster 3')
         plt.scatter(x_scaled[y_kmeans == 3, 0], x_scaled[y_kmeans ==
-                    3, 1], s=50, c='cyan', label="Cluster 4")
+                    3, 1], s=50, c='yellow', label="Cluster 4")
 
         # Plotting the centroids
         plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[
@@ -100,7 +99,7 @@ This function clusters a list of dataframes using k-means algorithm. The functio
 
         plt.legend()
         plt.show()
-        year = "2020"
+        year = "2019"
 
 
 clustering(dfs_cluster)
@@ -108,7 +107,7 @@ clustering(dfs_cluster)
 
 def fitting_predictions():
     '''
-This function takes in a dataset and performs curve fitting and linear regression to predict CO2 emissions from liquid fuel consumption (kt) based on Urban population growth in selected countries. It also generates a plot to show the best fitting function, confidence range, and plots to show the predicted values in 10 and 20 years. 
+This function takes in a dataset and predicts CO2 emissions from liquid fuel consumption (kt) based on the increase of urban populations in a subset of nations through curve fitting and linear regression. Additionally, it produces charts to display the confidence interval, the best fitting function, and the expected values in ten and twenty years. 
 '''
     popdata_fit = dataset[dataset["Indicator Code"] == "SP.URB.GROW"]
     fodata_fit = dataset[dataset["Indicator Code"] == "EN.ATM.CO2E.LF.KT"]
@@ -126,7 +125,7 @@ This function takes in a dataset and performs curve fitting and linear regressio
         "co2_con_liq": two_fo_fit})
     data_frame_fit = data_frame_fit.dropna(axis=0)
     data_frame_fit = data_frame_fit.loc[["India", "Australia", "United Kingdom", "Pakistan", "Brazil",
-                                         "Canada", "Russian Federation", "South Africa", "Austria", "Portugal", "Argentina", "Bangladesh",]]
+                                         "Canada", "Russian Federation", "South Africa", "Austria", "Portugal", "Aruba", "Bangladesh",]]
     xdata = data_frame_fit.iloc[:, 0].values
     ydata = data_frame_fit.iloc[:, 1].values
 
