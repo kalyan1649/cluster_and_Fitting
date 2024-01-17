@@ -61,3 +61,114 @@ This function uses the k-means method to cluster a list of dataframes. The elbow
         plt.xlabel('Number of clusters')
         plt.ylabel('WCSS')
         plt.show()
+
+        # Fitting kmeans to the dataset
+        kmeans = KMeans(n_clusters=4, init='k-means++',
+                        max_iter=300, n_init=10, random_state=0)
+        y_kmeans = kmeans.fit_predict(x_scaled)
+
+        # Plotting the clusters on original data
+        plt.scatter(x_scaled[y_kmeans == 0, 0], x_scaled[y_kmeans ==
+                    0, 1], s=50, c='red', label='Cluster 1')
+        plt.scatter(x_scaled[y_kmeans == 1, 0], x_scaled[y_kmeans ==
+                    1, 1], s=50, c='blue', label='Cluster 2')
+        plt.scatter(x_scaled[y_kmeans == 2, 0], x_scaled[y_kmeans ==
+                    2, 1], s=50, c='green', label='Cluster 3')
+        plt.scatter(x_scaled[y_kmeans == 3, 0], x_scaled[y_kmeans ==
+                    3, 1], s=50, c='cyan', label="Cluster 4")
+
+        # Plotting the centroids
+        plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[
+                    :, 1], s=100, marker="*", c='black', label='Centroids')
+
+        plt.title(f'Clusters of countries ' + year)
+        plt.xlabel("CIPA public sector management")
+        plt.ylabel("Arable land")
+
+        plt.legend()
+        plt.show()
+        year = "2020"
+
+
+clustering(dfs_cluster)
+
+
+def fitting_predictions():
+    '''
+This function takes in a dataset and performs curve fitting and linear regression to predict CO2 emissions from liquid fuel consumption (kt) based on Urban population growth in selected countries. It also generates a plot to show the best fitting function, confidence range, and plots to show the predicted values in 10 and 20 years. 
+'''
+    popdata_fit = dataset[dataset["Indicator Code"] == "SP.URB.GROW"]
+    fodata_fit = dataset[dataset["Indicator Code"] == "EN.ATM.CO2E.LF.KT"]
+    # fodata
+    popdata_fit = popdata_fit.drop(
+        ["Country Code", "Indicator Name", "Indicator Code"], axis=1).set_index("Country Name")
+    fodata_fit = fodata_fit.drop(
+        ["Country Code", "Indicator Name", "Indicator Code"], axis=1).set_index("Country Name")
+
+    two_pop_fit = popdata_fit["2012"]
+    two_fo_fit = fodata_fit["2012"]
+
+    data_frame_fit = pd.DataFrame({
+        "Urban_pop_grow": two_pop_fit,
+        "co2_con_liq": two_fo_fit})
+    data_frame_fit = data_frame_fit.dropna(axis=0)
+    data_frame_fit = data_frame_fit.loc[["India", "Australia", "United Kingdom", "Pakistan", "Brazil",
+                                         "Canada", "Russian Federation", "South Africa", "Austria", "Portugal", "Argentina", "Bangladesh",]]
+    xdata = data_frame_fit.iloc[:, 0].values
+    ydata = data_frame_fit.iloc[:, 1].values
+
+    # Define the function to fit
+    def func(x, a, b):
+        return a*x + b
+
+    # Fit the data
+    popt, pcov = curve_fit(func, xdata, ydata)
+
+    # Generate a plot showing the best fitting function
+    plt.plot(xdata, ydata, 'o', label='data')
+    plt.plot(xdata, func(xdata, *popt), 'r-',
+             label='fit: a=%5.3f, b=%5.3f' % tuple(popt))
+    plt.title("CO2 emission from liquid fuels vs Urban Population growth")
+    plt.xlabel('Urban population growth (annual %)')
+    plt.ylabel('CO2 emissions from liquid fuel consumption (kt)')
+    plt.legend()
+    plt.show()
+
+    # Compute the confidence ranges
+    def err_ranges(popt, pcov):
+        perr = np.sqrt(np.diag(pcov))
+        lower = popt - perr
+        upper = popt + perr
+        return lower, upper
+
+    # Generate a plot showing the confidence range
+    lower, upper = err_ranges(popt, pcov)
+    plt.plot(xdata, ydata, 'o', label='data')
+    plt.plot(xdata, func(xdata, *popt), 'r-',
+             label='fit: a=%5.3f, b=%5.3f' % tuple(popt))
+    plt.plot(xdata, func(xdata, *lower), 'b--',
+             label='lower: a=%5.3f, b=%5.3f' % tuple(lower))
+    plt.plot(xdata, func(xdata, *upper), 'g--',
+             label='upper: a=%5.3f, b=%5.3f' % tuple(upper))
+    plt.title("CO2 emission from liquid fuels vs Urban Population growth")
+    plt.xlabel('Urban population growth (annual %)')
+    plt.ylabel('CO2 emissions from liquid fuel consumption (kt)')
+    plt.legend()
+    plt.bbox_to_anchor = (0.5, -0.5)
+    plt.show()
+
+    # Use the model for predictions
+    slope, intercept, r_value, p_value, std_err = linregress(xdata, ydata)
+
+    # Predict the values in 10 years
+    xpred = 10
+    ypred = slope * xpred + intercept
+    print("CO2 emissions from liquid fuel consumption (kt) in 10 years: ", ypred)
+
+    # Predict the values in 20 years
+    xpred = 20
+    ypred = slope * xpred + intercept
+    print("CO2 emissions from liquid fuel consumption (kt) in 20 years: ", ypred)
+
+
+fitting_predictions()
