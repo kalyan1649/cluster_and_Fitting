@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Dec 22 16:33:57 2023
+
+@author: sai
+"""
+#GITHUB LINK = https://github.com/kalyan1649/cluster_and_Fitting
+
 # Necessary imports
 import numpy as np
 import matplotlib.pyplot as plt
