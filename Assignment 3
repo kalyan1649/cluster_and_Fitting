@@ -82,7 +82,37 @@ def data_frame_extracted(cluster_indi_codes, cluster_years):
 
 dfs_cluster = data_frame_extracted(cluster_indi_codes, cluster_years)
 
+'''
+def data_frame_extracted(cluster_indi_codes, cluster_years):
+    """This function retrieves the data for a specific year and indicator code
+    from the dataset, taking two arguments: `cluster_indi_codes` and `cluster_years'.
+    After that, it returns a list of transposed data frames and removes a few columns from the
+    dataset to produce a new transposed data frame.
+    """
+    public_sector = dataset[dataset["Indicator Code"] == cluster_indi_codes[0]]
+    arable_land = dataset[dataset["Indicator Code"] == cluster_indi_codes[1]]
+    
+    dfs = []
+    for year in cluster_years:
+        # Extract data for the specific year
+        public_ = public_sector[public_sector["Country Code"] == year].drop(
+            ["Country Code", "Indicator Name", "Indicator Code"], axis=1).set_index("Country Name").T
 
+        arable_ = arable_land[arable_land["Country Code"] == year].drop(
+            ["Country Code", "Indicator Name", "Indicator Code"], axis=1).set_index("Country Name").T
+
+        # Check if the DataFrames have any features
+        if not public_.empty:
+            dfs.append(public_)
+        if not arable_.empty:
+            dfs.append(arable_)
+
+    return dfs
+
+dfs_cluster = data_frame_extracted(cluster_indi_codes, cluster_years)
+
+# Now dfs_cluster is a list containing transposed DataFrames
+'''
 def clustering(data_frames):
     """
     This function uses the k-means method to cluster a list of dataframes.
@@ -141,7 +171,66 @@ def clustering(data_frames):
 
 
 clustering(dfs_cluster)
+'''
+def clustering(data_frames):
+    """
+    This function uses the k-means method to cluster a list of dataframes.
+    The elbow method is used by the function to determine the ideal number
+    of clusters after standard scaling the data. The clusters and their centroids
+    are then plotted on the original data once the k-means algorithm has been fitted
+    to the dataset.
+    """
+    year = "2006"
+    for df in data_frames:
+        x = df.values.T  # Transpose the DataFrame
+        scaler = StandardScaler()
+        x_scaled = scaler.fit_transform(x)
 
+        # Finding the optimum number of clusters
+        wcss = []
+        for i in range(1, 11):
+            kmeans = KMeans(n_clusters=i, init='k-means++',
+                            max_iter=300, n_init=10, random_state=42)
+            kmeans.fit(x_scaled)
+            wcss.append(kmeans.inertia_)
+
+        # Plotting the elbow graph
+        plt.plot(range(1, 11), wcss)
+        plt.title('The Elbow Method')
+        plt.xlabel('Number of clusters')
+        plt.ylabel('WCSS')
+        plt.show()
+
+        # Fitting kmeans to the dataset
+        kmeans = KMeans(n_clusters=4, init='k-means++',
+                        max_iter=300, n_init=10, random_state=0)
+        y_kmeans = kmeans.fit_predict(x_scaled)
+
+        # Plotting the clusters on original data
+        plt.scatter(x_scaled[y_kmeans == 0, 0], x_scaled[y_kmeans ==
+                    0, 1], s=50, c='limegreen', label='Cluster 1')
+        plt.scatter(x_scaled[y_kmeans == 1, 0], x_scaled[y_kmeans ==
+                    1, 1], s=50, c='blue', label='Cluster 2')
+        plt.scatter(x_scaled[y_kmeans == 2, 0], x_scaled[y_kmeans ==
+                    2, 1], s=50, c='red', label='Cluster 3')
+        plt.scatter(x_scaled[y_kmeans == 3, 0], x_scaled[y_kmeans ==
+                    3, 1], s=50, c='yellow', label="Cluster 4")
+
+        # Plotting the centroids
+        plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[
+                    :, 1], s=100, marker="*", c='black', label='Centroids')
+
+        plt.title(f'Clusters of countries ' + year)
+        plt.xlabel("CIPA public sector management")
+        plt.ylabel("Arable land")
+
+        plt.legend()
+        plt.show()
+        year = "2019"
+
+
+clustering(dfs_cluster)
+'''
 
 def fitting_predictions():
     '''
