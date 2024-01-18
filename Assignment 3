@@ -15,10 +15,44 @@ from scipy.stats import linregress
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 
-dataset = pd.read_csv("cluster.csv")
+def read_data(file_path):
+    """
+   a user-defined Pandas function for reading data from a CSV file.
 
-cluster_indi_codes = ["IQ.CPA.PUBS.XQ", "AG.LND.ARBL.ZS"]
-cluster_years = ["2006", "2019"]
+    Setting parameters
+    - file_path (str): The CSV file path.
+
+
+    Returns: - pd.DataFrame: The DataFrame has the read information in it.
+    """
+    try:
+        data = pd.read_csv(file_path)
+        return data
+    except FileNotFoundError:
+        print(f"Error: File not found at {file_path}")
+        return None
+    except pd.errors.EmptyDataError:
+        print("Error: The file is empty.")
+        return None
+    except pd.errors.ParserError:
+        print("Error: Unable to parse the CSV file.")
+        return None
+
+# Use the user-defined reading function to read the dataset
+file_path = "cluster.csv"
+dataset = read_data(file_path)
+
+if dataset is not None:
+    print("Data read successfully.")
+    # Continue with the rest of your code...
+
+    cluster_indi_codes = ["IQ.CPA.PUBS.XQ", "AG.LND.ARBL.ZS"]
+    cluster_years = ["2006", "2019"]
+
+    # The rest of your code...
+    # (data_frame_extracted, clustering, fitting_predictions, etc.)
+else:
+    print("Error: Data could not be read. Exiting...")
 
 
 def data_frame_extracted(cluster_indi_codes, cluster_years):
