@@ -4,7 +4,7 @@ Created on Fri Dec 22 16:33:57 2023
 
 @author: sai
 """
-#GITHUB LINK = https://github.com/kalyan1649/cluster_and_Fitting
+# GITHUB LINK = https://github.com/kalyan1649/cluster_and_Fitting
 
 # Necessary imports
 import numpy as np
@@ -15,7 +15,6 @@ from scipy.stats import linregress
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 
-
 dataset = pd.read_csv("cluster.csv")
 
 cluster_indi_codes = ["IQ.CPA.PUBS.XQ", "AG.LND.ARBL.ZS"]
@@ -23,7 +22,11 @@ cluster_years = ["2006", "2019"]
 
 
 def data_frame_extracted(cluster_indi_codes, cluster_years):
-    """ This function retrieves the data for a specific year and indicator code from the dataset, taking two arguments: `cluster_indi_codes` and `cluster_years'. After that, it returns a list of data frames and removes a few columns from the dataset to produce a new data frame."""
+    """This function retrieves the data for a specific year and indicator code
+    from the dataset, taking two arguments: `cluster_indi_codes` and `cluster_years'.
+    After that, it returns a list of data frames and removes a few columns from the
+    dataset to produce a new data frame.
+    """
     public_sector = dataset[dataset["Indicator Code"] == cluster_indi_codes[0]]
     arable_land = dataset[dataset["Indicator Code"] == cluster_indi_codes[1]]
     # fodata
@@ -46,12 +49,14 @@ def data_frame_extracted(cluster_indi_codes, cluster_years):
 dfs_cluster = data_frame_extracted(cluster_indi_codes, cluster_years)
 
 
-
-
 def clustering(data_frames):
     """
-This function uses the k-means method to cluster a list of dataframes. The elbow method is used by the function to determine the ideal number of clusters after standard scaling the data. The clusters and their centroids are then plotted on the original data once the k-means algorithm has been fitted to the dataset. 
-"""
+    This function uses the k-means method to cluster a list of dataframes.
+    The elbow method is used by the function to determine the ideal number
+    of clusters after standard scaling the data. The clusters and their centroids
+    are then plotted on the original data once the k-means algorithm has been fitted
+    to the dataset.
+    """
     year = "2006"
     for df in data_frames:
         x = df.values
@@ -106,8 +111,12 @@ clustering(dfs_cluster)
 
 def fitting_predictions():
     '''
-This function takes in a dataset and predicts CO2 emissions from liquid fuel consumption (kt) based on the increase of urban populations in a subset of nations through curve fitting and linear regression. Additionally, it produces charts to display the confidence interval, the best fitting function, and the expected values in ten and twenty years. 
-'''
+    This function takes in a dataset and predicts CO2 emissions from liquid fuel
+    consumption (kt) based on the increase of urban populations in a subset of
+    nations through curve fitting and linear regression. Additionally, it produces
+    charts to display the confidence interval, the best fitting function, and
+    the expected values in ten and twenty years.
+    '''
     popdata_fit = dataset[dataset["Indicator Code"] == "SP.URB.GROW"]
     fodata_fit = dataset[dataset["Indicator Code"] == "EN.ATM.CO2E.LF.KT"]
     # fodata
@@ -124,7 +133,7 @@ This function takes in a dataset and predicts CO2 emissions from liquid fuel con
         "co2_con_liq": two_fo_fit})
     data_frame_fit = data_frame_fit.dropna(axis=0)
     data_frame_fit = data_frame_fit.loc[["India", "Australia", "United Kingdom", "Pakistan", "Brazil",
-                                         "Canada", "Russian Federation", "South Africa", "Austria", "Portugal", "Aruba", "Bangladesh",]]
+                                         "Canada", "Russian Federation", "South Africa", "Austria", "Portugal", "Aruba", "Bangladesh", ]]
     xdata = data_frame_fit.iloc[:, 0].values
     ydata = data_frame_fit.iloc[:, 1].values
 
